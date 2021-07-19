@@ -5,7 +5,7 @@ import random
 import tensorflow as tf
 import tqdm
 import csv
-
+import json
 
 def load_dataset(enc, path, combine):
     paths = []
@@ -37,6 +37,17 @@ def load_dataset(enc, path, combine):
                 reader = csv.reader(fp)
                 for row in reader:
                     raw_text += start_token + row[0] + end_token + "\n"
+        elif path.endswith(".jsonl"):
+            ft_samples = []
+            with open(path, 'r') as reader:
+                for line in reader:
+                    items = json.loads(line.strip())
+                    context = items['context']
+                    completion = items['completion']
+                    ft_samples.append([context, completion])
+            
+            token_chunks = ft_samples
+            
         else:
             # Plain text
             with open(path, 'r', encoding='utf8', errors='ignore') as fp:
